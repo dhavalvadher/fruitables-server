@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const Routes = require('./routes/api/v1/index');
 const connectDB = require('./db/mongodb');
-const cors = require('cors')
+// const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const { facebookProvider, googleProvider } = require('./utils/Provider');
