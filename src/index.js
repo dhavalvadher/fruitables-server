@@ -39,7 +39,7 @@ app.use(
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cors({
   // origin : 'https://fruitables-client.vercel.app',
-  origin:'http://localhost:3000',
+  origin:'http://localhost:3000/',
   credentials: true
 }))
 
