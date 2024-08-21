@@ -8,12 +8,12 @@ const auth = (roles = []) => async (req, res, next) => {
 
         console.log(token);
 
-        if (!token) {
-            return res.status(401).json({
-                success: false,
-                message: "Please Proived Token"
-            })
-        }
+        // if (!token) {
+        //     return res.status(401).json({
+        //         success: false,
+        //         message: "Please Proived Token"
+        //     })
+        // }
 
         try {
 
