@@ -342,9 +342,22 @@ const logout = async (req, res) => {
                 message: "user not logged out"
             })
         }
+
+        const optionacc = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None'
+        }
+
+        const optionref = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'None'
+        }
+
         res.status(200)
-            .clearCookie("accessToken")
-            .clearCookie("refreshToken")
+            .clearCookie("accessToken",optionacc)
+            .clearCookie("refreshToken",optionref)
             .json({
                 success: true,
                 message: "User Logeed Out."
