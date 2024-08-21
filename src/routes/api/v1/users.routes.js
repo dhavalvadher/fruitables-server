@@ -76,12 +76,14 @@ routes.get('/google/callback',
             const optionacc = {
                 httpOnly: true,
                 secure: true,
+                sameSite: 'None',
                 maxAge: 60 * 60 * 1000
             }
     
             const optionref = {
                 httpOnly: true,
                 secure: true,
+                sameSite: 'None',
                 maxAge: 60 * 60 * 24 * 10 * 1000
             }
     
