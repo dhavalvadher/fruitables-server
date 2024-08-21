@@ -4,13 +4,13 @@ const validation = require('../../../middleware/validation')
 const { categotyValidtion } = require('../../../../validation')
 
 // const { categotyValidtion } = require('../../../../validation')
-// const auth = require('../../../middleware/auth')
+const auth = require('../../../middleware/auth')
 
 const route = express.Router()
 
 route.get(
     '/list_categories',
-    // auth(["dhavall","admin"]),
+    auth(["dhavall","users"]),
     categoriescontroller.listcategory
 )
 
