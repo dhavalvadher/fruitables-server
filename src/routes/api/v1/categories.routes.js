@@ -1,6 +1,5 @@
 const express = require('express')
 const { categoriescontroller } = require('../../../controller')
-const upload = require('../../../middleware/upload')
 const validation = require('../../../middleware/validation')
 const { categotyValidtion } = require('../../../../validation')
 
@@ -15,8 +14,14 @@ route.get(
     categoriescontroller.listcategory
 )
 
+// route.get(
+//     '/get_categories/:category_id',
+//     validation(categotyValidtion.getCategory),
+//     categoriescontroller.getcategories
+// )
+
 route.get(
-    '/get_categories/:category_id',
+    '/get_categories',
     validation(categotyValidtion.getCategory),
     categoriescontroller.getcategories
 )
