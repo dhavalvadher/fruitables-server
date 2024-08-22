@@ -25,7 +25,7 @@ const listcategory = async (req, res) => {
             })
         }
 
-        let startIndex = 0, endIndex = 0, pagination = 0;
+        let startIndex = 0, endIndex = 0, pagination = [...categories];
 
         if (page > 0 || pageSize > 0) {
             startIndex = (page - 1) * pageSize;
@@ -83,30 +83,30 @@ const postcategories = async (req, res) => {
 
     console.log("dhavhvqdhws", req.body);
 
-    // try {
-    //     console.log(req.body);
+    try {
+        console.log(req.body);
 
-    //     const category = await Categories.create(req.body);
-    //     console.log(category);
+        const category = await Categories.create(req.body);
+        console.log(category);
 
-    //     if (!category) {
-    //         res.status(400).json({
-    //             success: false,
-    //             message: "Category not creted"
-    //         })
-    //     }
+        if (!category) {
+            res.status(400).json({
+                success: false,
+                message: "Category not creted"
+            })
+        }
 
-    //     res.status(201).json({
-    //         success: true,
-    //         message: "Category careted sucessfully",
-    //         data: category
-    //     })
-    // } catch (error) {
-    //     res.status(500).json({
-    //         success: false,
-    //         message: "internal server error:" + error.message
-    //     })
-    // }
+        res.status(201).json({
+            success: true,
+            message: "Category careted sucessfully",
+            data: category
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "internal server error:" + error.message
+        })
+    }
 }
 
 const deletecategories = async (req, res) => {
@@ -140,7 +140,7 @@ const deletecategories = async (req, res) => {
 }
 
 const updatecategories = async (req, res) => {
-    // console.log("hdbdjwh",req.params.category_id, req.body);
+    console.log("hdbdjwh",req.params.category_id, req.body);
 
 
 

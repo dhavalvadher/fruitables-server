@@ -3,8 +3,10 @@ const Users = require('../model/users.model');
 
 const auth = (roles = []) => async (req, res, next) => {
     try {
+        console.log("dddddd",roles);
+        
 
-        const token = req.cookies.accrestoken || req.header("Authorization")?.replace("Bearer", "");
+        const token = req.cookies.accessToken || req.header("Authorization")?.replace("Bearer", "");
 
         console.log(token);
 
@@ -14,6 +16,8 @@ const auth = (roles = []) => async (req, res, next) => {
                 message: "Please Proived Token"
             })
         }
+        console.log("dddhdhd",token);
+        
 
         try {
 
@@ -63,3 +67,4 @@ const auth = (roles = []) => async (req, res, next) => {
 
 
 module.exports = auth;
+
