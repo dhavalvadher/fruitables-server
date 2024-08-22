@@ -10,7 +10,7 @@ const route = express.Router()
 
 route.get(
     '/list_categories',
-    auth(["dhavall","users"]),
+    auth(["dhavall","user"]),
     categoriescontroller.listcategory
 )
 
