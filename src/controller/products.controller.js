@@ -58,44 +58,44 @@ const addProducts = async (req, res) => {
     console.log("add image",req.file);
 
 
-    try {
-        // console.log(req.body);
-        // console.log(req.file);
+    // try {
+    //     // console.log(req.body);
+    //     // console.log(req.file);
 
-        const fileRes = await uploadFile(req.file.path, "Product");
-        console.log(fileRes);
-
-
-        // const { subcategory_id, ...productData } = req.body;
+    //     const fileRes = await uploadFile(req.file.path, "Product");
+    //     console.log(fileRes);
 
 
-        const products = await Products.create({
-            ...req.body,
-            product_image: {
-                public_id: fileRes.public_id,
-                url: fileRes.url
-            },
-        });
+    //     // const { subcategory_id, ...productData } = req.body;
 
-        if (!products) {
-            return res.status(400).json({
-                success: false,
-                message: "Product not created"
-            });
-        }
 
-        res.status(200).json({
-            success: true,
-            message: "Product created successfully",
-            data: products
-        });
+    //     const products = await Products.create({
+    //         ...req.body,
+    //         product_image: {
+    //             public_id: fileRes.public_id,
+    //             url: fileRes.url
+    //         },
+    //     });
 
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Internal server error: " + error.message
-        });
-    }
+    //     if (!products) {
+    //         return res.status(400).json({
+    //             success: false,
+    //             message: "Product not created"
+    //         });
+    //     }
+
+    //     res.status(200).json({
+    //         success: true,
+    //         message: "Product created successfully",
+    //         data: products
+    //     });
+
+    // } catch (error) {
+    //     res.status(500).json({
+    //         success: false,
+    //         message: "Internal server error: " + error.message
+    //     });
+    // }
 }
 
 const updateProducts = async (req, res) => {
