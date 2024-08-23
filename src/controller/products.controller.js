@@ -55,11 +55,12 @@ const getProduct = async (req, res) => {
 
 const addProducts = async (req, res) => {
 
+    console.log("add image",req.file);
 
 
     try {
-        console.log(req.body);
-        console.log(req.file);
+        // console.log(req.body);
+        // console.log(req.file);
 
         const fileRes = await uploadFile(req.file.path, "Product");
         console.log(fileRes);
@@ -100,6 +101,7 @@ const addProducts = async (req, res) => {
 const updateProducts = async (req, res) => {
 
     // console.log("abcd", req.params.product_id, req.body, req.file);
+
 
 
 
@@ -515,63 +517,63 @@ const Search = async (req, res) => {
 
         const pipline = [
             {
-              $lookup: {
-                from: 'variants',
-                localField: '_id',
-                foreignField: 'product_id',
-                as: 'variant'
-              }
-            },
-            {
-              $lookup: {
-                from: 'reviews',
-                localField: '_id',
-                foreignField: 'product_id',
-                as: 'review'
-              }
-            },
-            {
-              $addFields: {
-                avgrating:'$review.rating'
-              }
-            },
-            {
-              $unwind: {
-                path: '$variant',
-                
-              }
-            },
-            {
-              $match: {
-                   avgrating:{$gte:4},
-                category_id:1,
-                'variant.attributes.Price':{$gte:0 , $lte:2000}
-              }
-            },
-            {
-              $group: {
-                _id: '$_id',
-                name:{$first:'$name'},
-               variant:{$push:"$variant"},
-                review:{$push:"$review"}
+                $lookup: {
+                    from: 'variants',
+                    localField: '_id',
+                    foreignField: 'product_id',
+                    as: 'variant'
                 }
             },
             {
-              $sort: {
-                name: sortOrder === 'asc' ?1 : -1
-              }
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'product_id',
+                    as: 'review'
+                }
+            },
+            {
+                $addFields: {
+                    avgrating: '$review.rating'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$variant',
+
+                }
+            },
+            {
+                $match: {
+                    avgrating: { $gte: 4 },
+                    category_id: 1,
+                    'variant.attributes.Price': { $gte: 0, $lte: 2000 }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    name: { $first: '$name' },
+                    variant: { $push: "$variant" },
+                    review: { $push: "$review" }
+                }
+            },
+            {
+                $sort: {
+                    name: sortOrder === 'asc' ? 1 : -1
+                }
             }
-          ]
+        ]
 
         //   console.log(p,l);
-          
+
         if (p > 0 && l > 0) {
             pipline.push({ $skip: (p - 1) * l })
-            pipline.push({ $limit:  l })
+            pipline.push({ $limit: l })
         }
 
         // console.log(JSON.stringify(pipline));
-        
+
 
         const data = await Products.aggregate(pipline)
         // console.log(req.query)
@@ -579,9 +581,9 @@ const Search = async (req, res) => {
 
 
         res.status(400).json({
-            success : true,
-            message : "Product data fected",
-            data : data
+            success: true,
+            message: "Product data fected",
+            data: data
         })
 
     } catch (error) {

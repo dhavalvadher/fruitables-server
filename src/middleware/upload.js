@@ -7,17 +7,20 @@ const storage = multer.diskStorage({
 
         console.log(file.fieldname);
 
-        const filepath = path.join('public', file.fieldname)
+        // const filepath = path.join('public', file.fieldname)
+
+        const filepath = path.join("/temp", file.fieldname)
+        console.log();
+        
 
         fs.mkdir(filepath, {
             recursive: true
         }, (err) => {
             if (err) {
-                console.error(err)
-                cb(error)
+               return cb(err,null)
             }
-            cb(null,filepath)
         })
+        cb(null,filepath)
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
