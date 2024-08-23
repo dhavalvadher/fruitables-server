@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
             recursive: true
         }, (err) => {
             if (err) {
-               cb(err,null)
+               return cb(err,null)
             }
         })
         cb(null,filepath)
