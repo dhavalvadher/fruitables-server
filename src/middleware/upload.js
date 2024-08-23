@@ -7,9 +7,9 @@ const storage = multer.diskStorage({
 
         console.log(file.fieldname);
         // let fieldname = req.fieldname
-        // const filepath = path.join('public', fieldname)
+        // const filepath = path.join('public', file.fieldname)
 
-        const filepath = path.join("/tmp", req.fieldname)
+        const filepath = path.join("/tmp", file.fieldname)
         console.log("filepathhhhh", filepath);
 
 
