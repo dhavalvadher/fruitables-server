@@ -374,7 +374,6 @@ module.exports = {
     updateSubcategory,
     deleteSubcategory,
     subcategoryBycategory,
-    
     countProduct,
     inactivesubcategory,
     parentOfSubcategory,

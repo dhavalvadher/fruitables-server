@@ -57,5 +57,8 @@ route.get(
     "/search",
     productsController.Search
 );
-
+route.get(
+    '/variant-details/:product_id',
+    productsController.variantsDatils
+)
 module.exports = route;

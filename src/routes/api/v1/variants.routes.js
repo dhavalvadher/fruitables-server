@@ -32,4 +32,42 @@ routes.delete(
     variantsController.deleteVariant
 )
 
+
+routes.get(
+    '/count-stock/:variant_id',
+    variantsController.countstock
+)
+
+routes.get(
+    '/active',
+    variantsController.activevarint
+)
+
+routes.get(
+    '/count-products',
+    variantsController.countptoduct
+)
+
+routes.get(
+    '/product/:product_id',
+    variantsController.variantparticularproduct
+)
+
+routes.get(
+    '/list-variant/:product_id',
+    variantsController.Variantdetails
+)
+
+routes.get('/product-highest-Price',
+    variantsController.productswithhighesprices
+)
+
+routes.get('/multiple-variants',
+    variantsController.morethanonevariant
+)
+
+routes.get('/low-quantity',
+    variantsController.productslowstock
+)
+
 module.exports = routes;

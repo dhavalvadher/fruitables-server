@@ -208,8 +208,6 @@ const deleteProducts = async (req, res) => {
     }
 }
 
-
-
 const productsByCategory = async (req, res) => {
 
     const products = await Products.aggregate([
@@ -389,103 +387,6 @@ const countCategories = async (req, res) => {
 
 }
 
-
-// const searchProducts = async (req, res) => {
-//     try {
-//         const { sortOrder, rating, max, min, category, page, limit } = req.body
-
-
-//         const matchPip = {}
-
-//         if (rating) {
-//             matchPip['avgRating'] = { "$gte": rating }
-//         }
-//         if (category) {
-//             matchPip['category_id'] = category
-//         }
-
-//         matchPip['variant.attributes.Price'] = {}
-
-//         if (min != undefined) {
-//             matchPip['variant.attributes.Price'].$gt = min
-//         }
-
-//         if (max != undefined) {
-//             matchPip['variant.attributes.Price'].$lte = max
-//         }
-
-//         console.log(matchPip);
-
-//         const pipline = [
-
-//             {
-//                 $lookup: {
-//                     from: "reviews",
-//                     localField: "_id",
-//                     foreignField: "product_id",
-//                     as: "review"
-//                 }
-//             },
-//             {
-//                 $lookup: {
-//                     from: "variants",
-//                     localField: "_id",
-//                     foreignField: "product_id",
-//                     as: "variant"
-//                 }
-//             },
-//             {
-//                 $addFields: {
-//                   avgrating:'$review.rating'
-//                 }
-//               },
-//             {
-//                 $unwind: {
-//                     path: "$variant"
-//                 }
-//             },
-//             {
-//                 $match: matchPip
-//             },
-//             {
-//                 $group: {
-//                     _id: "$_id",
-//                     "name": { $first: "$name" },
-//                     "review": { $push: "$review" },
-//                     "variant": { $push: "$variant" }
-//                 }
-//             },
-//             {
-//                 $sort: {
-//                     name: sortOrder === 'asc' ? 1 : -1
-//                 }
-//             }
-//         ]
-
-//         if (page > 0 && limit > 0) {
-//             pipline.push({ $skip: (page - 1) * limit })
-//             pipline.push({ $limit: limit })
-//         }
-
-//         const data = await Products.aggregate(pipline)
-//         console.log(req.query)
-//         console.log(JSON.stringify(data));
-
-
-//         res.status(400).json({
-//             success: true,
-//             message: "Product data fected",
-//             data: data
-//         })
-
-//     } catch (error) {
-//         console.log(error.message);
-
-//     }
-// }
-
-
-
 const Search = async (req, res) => {
     // localhost:8000/api/v1/products/Search?sortOrder=asc&rating=4&max=10000&min=0&category=1&page=2&limit=1
     try {
@@ -592,6 +493,48 @@ const Search = async (req, res) => {
     }
 }
 
+const variantsDatils = async (req, res) => {
+    const variantsDatils = await Products.aggregate(
+        [
+            {
+                "$lookup": {
+                    "from": "variants",
+                    "localField": "_id",
+                    "foreignField": "product_id",
+                    "as": "variants"
+                }
+            },
+            {
+                "$unwind": {
+                    "path": "$variants",
+                }
+            },
+            {
+                "$project": {
+                    "_id": 1,
+                    "name": 1,
+                    "description": 1,
+                    "price": 1,
+                    "stock": 1,
+                    "variants": {
+                        "_id": "$variants._id",
+                        "variant_name": "$variants.name",
+                        "variant_price": "$variants.price",
+                        "variant_stock": "$variants.stock",
+                        "variant_details": "$variants.details"
+                    }
+                }
+            }
+        ]
+  
+    )
+    res.status(200).json({
+        success: true,
+        message: "Products get  succesfully",
+        data: variantsDatils
+    })
+}
+
 module.exports = {
     listProducts,
     addProducts,
@@ -603,6 +546,6 @@ module.exports = {
     topRatating,
     newArrivals,
     countCategories,
-    Search
-
+    Search,
+    variantsDatils
 }

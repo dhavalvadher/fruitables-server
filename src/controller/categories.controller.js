@@ -47,7 +47,6 @@ const listcategory = async (req, res) => {
     }
 }
 
-
 const getcategories = async (req, res) => {
     try {
 
@@ -77,7 +76,6 @@ const getcategories = async (req, res) => {
         })
     }
 }
-
 
 const postcategories = async (req, res) => {
 
@@ -168,9 +166,6 @@ const updatecategories = async (req, res) => {
     }
 }
 
-
-
-
 const countactive = async (req, res) => {
 
     const activeCount = await Categories.aggregate([
@@ -209,7 +204,6 @@ const inactive = async (req, res) => {
     })
     console.log(inactiveCount);
 }
-
 
 const mostproducts = async (req, res) => {
 
@@ -293,7 +287,6 @@ const totalProducts = async (req, res) => {
     });
 };
 
-
 const averageproducts = async (req, res) => {
     const totalProducts = await Categories.aggregate([
         [
@@ -329,9 +322,6 @@ const averageproducts = async (req, res) => {
         data: totalProducts
     });
 };
-
-
-
 
 const specific = async (req, res) => {
     const categories = await Categories.aggregate([
