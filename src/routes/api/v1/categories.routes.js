@@ -21,10 +21,10 @@ route.get(
 // )
 
 route.get(
-    '/get_categories',
-    validation(categotyValidtion.getCategory),
+    '/get_categories/:category_id',
+    validation(categotyValidtion.getCategory), // Use correct validation schema
     categoriescontroller.getcategories
-)
+);
 
 route.post(
     '/post_categories',
@@ -45,34 +45,33 @@ route.delete(
 )
 
 route.get(
-    '/count-active',
-    categoriescontroller.countactive
+    '/getActive',
+    categoriescontroller.countActive
 )
 
 route.get(
-    '/inactive',
-    categoriescontroller.inactive
+    '/getInactive',
+    categoriescontroller.countinActive
 )
 
 route.get(
-    '/mostProducts',
-    categoriescontroller.mostproducts 
+    '/most-products',
+    categoriescontroller.highestnum
 )
-
 route.get(
-    '/totalProducts',
-    categoriescontroller.totalProducts
+    '/count-subcategories',
+    categoriescontroller.countsubcategories
 )
-
 route.get(
-    '/averageproducts',
-    categoriescontroller.averageproducts
+    '/category-subcategory/:category_id',
+    categoriescontroller.subcategorioncategories
 )
-
 route.get(
-    '/specific',
+    '/average-products',
+    categoriescontroller.totalProduct
+)
+route.get(
+    '/specific/:category_id',
     categoriescontroller.specific
 )
-
-
 module.exports = route 

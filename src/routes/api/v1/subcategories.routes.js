@@ -9,7 +9,7 @@ router.get(
 );
 
 router.get(
-    "/get-subcategory/:subcategory_id",
+    "/get-subcategories/:subcategory_id",
     subcategoriesController.getSubcategory
 );
 
@@ -29,42 +29,33 @@ router.delete(
 );
 
 router.get(
-    "/subcategory-Bycategory/:category_id",
-    subcategoriesController.subcategoryBycategory
+    '/get-subcategoryBycategory/:subcategory_id',
+    subcategoriesController.getSubcategoryByCtegory
 )
 
 router.get(
-    "/count-products",
-    subcategoriesController.countProduct
-)
-
-router.get(
-    "/inactive",
-    subcategoriesController.inactivesubcategory
-)
-router.get(
-    "/countProduct",
-    subcategoriesController.countProduct
-)
-
-
-
-router.get(
-    "/parentOfSubcategory",
-    subcategoriesController.parentOfSubcategory
-)
-router.get(
-    "/mostProducts",
-    subcategoriesController.mostProducts
-)
-router.get(
-    "/countActive",
-    subcategoriesController.countActive
-)
-router.get(
-    "/countProducts",
+    '/count-products',
     subcategoriesController.countProducts
 )
 
+router.get(
+    '/inactive',
+    subcategoriesController.listOfSubcategory
+)
+
+router.get(
+    '/parent-of-subcategory/:category_id',
+    subcategoriesController.subcategorioncategory
+)
+
+router.get(
+    '/most-products',
+    subcategoriesController.highestcategori
+)
+
+router.get(
+    '/count-active',
+    subcategoriesController.activesubcategory
+)
 
 module.exports = router;

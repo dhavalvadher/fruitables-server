@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Products = require("../model/products.model");
 const uploadFile = require("../utils/cloudinary");
 
@@ -55,7 +56,7 @@ const getProduct = async (req, res) => {
 
 const addProducts = async (req, res) => {
 
-    console.log("add image",req.file);
+    console.log("add image", req.file);
 
 
     try {
@@ -208,80 +209,155 @@ const deleteProducts = async (req, res) => {
     }
 }
 
-const productsByCategory = async (req, res) => {
+const getProductBySubcategory = async (req, res) => {
+    try {
+        const product = await Products.find({ product_id: req.params.product_id })
+        console.log(product);
 
-    const products = await Products.aggregate([
-
-        {
-            $lookup: {
-                from: "categories",
-                localField: "category_id",
-                foreignField: "_id",
-                as: "category"
-            }
-        },
-        {
-            $unwind: {
-                path: "$category"
-            }
-        },
-        {
-            $project: {
-                "name": 1,
-                "product_img.url": 1,
-                "category": 1
-            }
+        if (!product) {
+            res.status(404).json({
+                success: false,
+                message: 'product not found.'
+            })
         }
-
-    ])
-
-    res.status(200).json({
-        success: true,
-        message: "Products get  succesfully",
-        data: products
-    })
-
-    console.log(products);
-
+        res.status(200).json({
+            success: true,
+            message: 'product fetch successfully.',
+            data: product
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.' + error.message
+        })
+    }
 }
 
-const productsBySubcategory = async (req, res) => {
+const Countcategory = async (req, res) => {
+    console.log("ok");
 
-    const products = await Products.aggregate([
+    const Countcategory = await Products.aggregate(
+        [
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "category"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$category",
 
-        {
-            $lookup: {
-                from: "subcategories",
-                localField: "subcategory_id",
-                foreignField: "_id",
-                as: "subcategory"
+                }
+            },
+            {
+                $group: {
+                    _id: "$category_id",
+                    Category_name: { $first: "$category.name" },
+                    Product_name: { $first: "$name" },
+                    countproduct: {
+                        $sum: 1
+                    }
+                }
             }
-        },
-        {
-            $unwind: {
-                path: "$subcategory"
-            }
-        },
-        {
-            $project: {
-                "name": 1,
-                "product_img.url": 1,
-                "subcategory": 1
-            }
-        }
-    ])
-
+        ]
+    )
     res.status(200).json({
         success: true,
-        message: "Products get  succesfully",
-        data: products
+        message: 'product fetch successfully.',
+        data: Countcategory
     })
-
-    console.log(products);
-
+    console.log(Countcategory);
 }
 
-const topRatating = async (req, res) => {
+const outofstock = async (req, res) => {
+    console.log("ok");
+
+    const outofstock = await Products.aggregate([
+        {
+            "$match": {
+                "isActive": true
+            }
+        },
+        {
+            "$lookup": {
+                "from": "variants",
+                "localField": "_id",
+                "foreignField": "product_id",
+                "as": "variants"
+            }
+        },
+        {
+            "$match": {
+                "variants": { "$size": 0 }
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "name": 1,
+                "description": 1,
+                "price": 1,
+                "stock": 1
+            }
+        }
+    ]
+    )
+    res.status(200).json({
+        success: true,
+        message: 'product fetch successfully.',
+        data: outofstock
+    })
+    console.log(outofstock);
+}
+
+const productByCategory = async (req, res) => {
+    console.log("ok");
+    const productByCategory = await Products.aggregate(
+        [
+            // {
+            //     $match: {
+            //         category_id: new mongoose.Types.ObjectId(category_id)
+            //     }
+            // },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "categories"
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    category: {
+                        $first: "$name"
+                    },
+                    ProdcutCount: {
+                        $sum: 1
+                    },
+                    product: {
+                        $push: "$categories.name"
+                    }
+                }
+            },
+            {
+                $unwind: "$product"
+            }
+        ]
+    )
+    res.status(200).json({
+        success: true,
+        message: 'product fetch successfully.',
+        data: productByCategory
+    })
+    console.log(productByCategory);
+}
+
+const topRate = async (req, res) => {
 
     const products = await Products.aggregate([
         {
@@ -300,15 +376,25 @@ const topRatating = async (req, res) => {
         {
             $group: {
                 _id: "$_id",
-                "product_name": { $first: "$name" },
-                "Totalrating": {
+                product_name: { $first: "$name" },
+                Totalrating: {
                     $sum: "$review.rating"
+                },
+                totalperson: {
+                    $sum: 1
+                }
+            }
+        },
+        {
+            $addFields: {
+                avgbyrate: {
+                    $divide: ["$Totalrating", "$totalperson"]
                 }
             }
         },
         {
             $sort: {
-                "Totalrating": -1
+                avgbyrate: -1
             }
         },
         {
@@ -349,148 +435,73 @@ const newArrivals = async (req, res) => {
 
 }
 
-const countCategories = async (req, res) => {
-
-    const products = await Products.aggregate([
-        {
-            $lookup: {
-                from: "categories",
-                localField: "category_id",
-                foreignField: "_id",
-                as: "category"
-            }
-        },
-        {
-            $unwind: {
-                path: "$category"
-            }
-        },
-        {
-            $group: {
-                _id: "$category._id",
-                "category_name": { $first: "$category.name" },
-                "product_name": { $push: "$name" },
-                "TotalProduct": {
-                    $sum: 1
-                }
-            }
-        }
-    ])
-
-    res.status(200).json({
-        success: true,
-        message: "Products get  succesfully",
-        data: products
-    })
-
-    console.log(products);
-
-}
-
-const Search = async (req, res) => {
-    // localhost:8000/api/v1/products/Search?sortOrder=asc&rating=4&max=10000&min=0&category=1&page=2&limit=1
-    try {
-        const { sortOrder, rating, max, min, category, page, limit } = req.query
-
-        let p = parseInt(page);
-        let l = parseInt(limit);
-
-        const matchPip = {}
-
-        if (rating) {
-            matchPip['avgRating'] = { "$gte": rating }
-        }
-        if (category) {
-            matchPip['category_id'] = category
-        }
-
-        matchPip['variant.attributes.Price'] = {}
-
-        if (min != undefined) {
-            matchPip['variant.attributes.Price'].$gt = min
-        }
-
-        if (max != undefined) {
-            matchPip['variant.attributes.Price'].$lte = max
-        }
-
-        // console.log(matchPip);
-
-        const pipline = [
+const discounts = async (req, res) => {
+    const discounts = await Products.aggregate(
+        [
             {
-                $lookup: {
-                    from: 'variants',
-                    localField: '_id',
-                    foreignField: 'product_id',
-                    as: 'variant'
+                "$match": {
+                    "isActive": true
                 }
             },
             {
-                $lookup: {
-                    from: 'reviews',
-                    localField: '_id',
-                    foreignField: 'product_id',
-                    as: 'review'
+                "$lookup": {
+                    "from": "categories",
+                    "localField": "category_id",
+                    "foreignField": "_id",
+                    "as": "category"
                 }
             },
             {
-                $addFields: {
-                    avgrating: '$review.rating'
+                "$lookup": {
+                    "from": "subcategories",
+                    "localField": "subcategory_id",
+                    "foreignField": "_id",
+                    "as": "subcategory"
                 }
             },
             {
-                $unwind: {
-                    path: '$variant',
-
+                "$unwind": "$category"
+            },
+            {
+                "$unwind": "$subcategory"
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "category_id": "$category_id",
+                        "subcategory_id": "$subcategory_id"
+                    },
+                    "category_name": { "$first": "$category.name" },
+                    "subcategory_name": { "$first": "$subcategory.name" },
+                    "products": {
+                        "$push": {
+                            "_id": "$_id",
+                            "name": "$name",
+                            "description": "$description",
+                            "price": "$price",
+                            "stock": "$stock"
+                        }
+                    }
                 }
             },
             {
-                $match: {
-                    avgrating: { $gte: 4 },
-                    category_id: 1,
-                    'variant.attributes.Price': { $gte: 0, $lte: 2000 }
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    name: { $first: '$name' },
-                    variant: { $push: "$variant" },
-                    review: { $push: "$review" }
-                }
-            },
-            {
-                $sort: {
-                    name: sortOrder === 'asc' ? 1 : -1
+                "$project": {
+                    "_id": 0,
+                    "category_id": "$_id.category_id",
+                    "subcategory_id": "$_id.subcategory_id",
+                    "category_name": 1,
+                    "subcategory_name": 1,
+                    "products": 1
                 }
             }
         ]
 
-        //   console.log(p,l);
-
-        if (p > 0 && l > 0) {
-            pipline.push({ $skip: (p - 1) * l })
-            pipline.push({ $limit: l })
-        }
-
-        // console.log(JSON.stringify(pipline));
-
-
-        const data = await Products.aggregate(pipline)
-        // console.log(req.query)
-        // console.log(data);
-
-
-        res.status(400).json({
-            success: true,
-            message: "Product data fected",
-            data: data
-        })
-
-    } catch (error) {
-        console.log(error.message);
-
-    }
+    )
+    res.status(200).json({
+        success: true,
+        message: "Products get  succesfully",
+        data: discounts
+    })
 }
 
 const variantsDatils = async (req, res) => {
@@ -507,6 +518,7 @@ const variantsDatils = async (req, res) => {
             {
                 "$unwind": {
                     "path": "$variants",
+                    "preserveNullAndEmptyArrays": true
                 }
             },
             {
@@ -526,7 +538,7 @@ const variantsDatils = async (req, res) => {
                 }
             }
         ]
-  
+
     )
     res.status(200).json({
         success: true,
@@ -535,17 +547,114 @@ const variantsDatils = async (req, res) => {
     })
 }
 
+const searchProducts = async (req, res) => {
+    try {
+        const { sortOrder, rating, max, min, category, page, limit } = req.body
+
+        const metchpip = {}
+
+        if (rating) {
+            metchpip['avgRating'] = {
+                $gte: rating
+            }
+        }
+
+        if (category) {
+            metchpip['category_id'] = category
+        }
+
+        metchpip['variants.attributes.Price'] = {
+
+        }
+
+        if (max != undefined) {
+            metchpip['variants.attributes.Price'].$lte = parseInt(min)
+        }
+
+        if (min != undefined) {
+            metchpip['variants.attributes.Price'].$gte = parseInt(max)
+        }
+
+        console.log(metchpip);
+
+        const pipeline = [
+            {
+                $lookup: {
+                    from: "variants",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "variants"
+                }
+            },
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "_id",
+                    foreignField: "product_id",
+                    as: "reviews"
+                }
+            },
+            {
+                $addFields: {
+                    avgRating: { $avg: "$reviews.rating" }
+                }
+            },
+            {
+                $unwind: "$variants"
+            },
+            {
+                $match: metchpip
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    "name": { $first: '$name' },
+                    "variants": { $push: "$variants" },
+                    "reviews": { $push: "$reviews" }
+                }
+            },
+            {
+                $sort: {
+                    name: sortOrder === "acs" ? 1 : -1
+                }
+            }
+        ]
+
+        if (parseInt(page) > 0 && parseInt(limit) > 0) {
+            pipeline.push({ $skip: (parseInt(page) - 1) * parseInt(limit) })
+            pipeline.push({ $limit: parseInt(limit) })
+        }
+
+        const data = await Products.aggregate(pipeline);
+        console.log(data);
+
+        res.status(200).json({
+            success: true,
+            message: 'Product aggregate successfully.',
+            data: data
+        });
+
+    } catch (error) {
+        console.log(error);
+
+    }
+}
+
+
+
 module.exports = {
     listProducts,
     addProducts,
     updateProducts,
     deleteProducts,
     getProduct,
-    productsByCategory,
-    productsBySubcategory,
-    topRatating,
     newArrivals,
-    countCategories,
-    Search,
-    variantsDatils
+    variantsDatils,
+    getProductBySubcategory,
+    searchProducts,
+    discounts,
+    topRate,
+    Countcategory,
+    productByCategory,
+    outofstock
 }

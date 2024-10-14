@@ -1,73 +1,70 @@
 const express = require('express');
-const { variantsController } = require('../../../controller');
-const upload = require('../../../middleware/upload');
+const { controllerVariants } = require('../../../controller');
+const upload = require("../../../middleware/upload");
 
+const route = express.Router()
 
-const routes = express.Router();
-
-routes.get(
-    '/list-variant',
-    variantsController.listVariants
-)
-
-routes.get(
+route.get(
     '/get-variant/:variant_id',
-    variantsController.getVariant
+    controllerVariants.getVariant
 )
 
-routes.post(
+route.get(
+    '/list-variants',
+    controllerVariants.listVariants
+)
+
+route.post(
     '/add-variant',
-    upload.single("variants_image"),
-    variantsController.addVariant
+    upload.single('variant_image'),
+    controllerVariants.addVariant
 )
-
-routes.put(
+route.put(
     '/update-variant/:variant_id',
-    upload.single("variants_image"),
-    variantsController.updateVariant
+    upload.single('variant_image'),
+    controllerVariants.updateVariant
 )
 
-routes.delete(
+route.delete(
     '/delete-variant/:variant_id',
-    variantsController.deleteVariant
+    controllerVariants.deleteVariant
 )
 
-
-routes.get(
+route.get(
     '/count-stock/:variant_id',
-    variantsController.countstock
+    controllerVariants.countstock
 )
 
-routes.get(
+route.get(
     '/active',
-    variantsController.activevarint
+    controllerVariants.activevarint
 )
 
-routes.get(
+route.get(
     '/count-products',
-    variantsController.countptoduct
+    controllerVariants.countptoduct
 )
 
-routes.get(
-    '/product/:product_id',
-    variantsController.variantparticularproduct
+route.get(
+    '/particular-variant/:product_id',
+    controllerVariants.variantparticularproduct
 )
 
-routes.get(
+route.get(
     '/list-variant/:product_id',
-    variantsController.Variantdetails
+    controllerVariants.Variantdetails
 )
 
-routes.get('/product-highest-Price',
-    variantsController.productswithhighesprices
+route.get(
+    '/low-quantity',
+    controllerVariants.productslowstock
 )
-
-routes.get('/multiple-variants',
-    variantsController.morethanonevariant
+route.get(
+    '/high-price',
+    controllerVariants.productswithhighesprices
 )
-
-routes.get('/low-quantity',
-    variantsController.productslowstock
+route.get(
+    '/multiple-variants',
+    controllerVariants.morethanonevariant
 )
-
-module.exports = routes;
+module.exports = route;

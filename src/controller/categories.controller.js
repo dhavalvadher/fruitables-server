@@ -1,358 +1,393 @@
 const Categories = require("../model/categories.model");
+const mongoose = require("mongoose");
 
 const listcategory = async (req, res) => {
-
-    // console.log("cateee", req.query.page, req.query.pageSize);
-
     try {
-        const page = parseInt(req.query.page);
-        const pageSize = parseInt(req.query.pageSize);
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 10;
 
         if (page <= 0 || pageSize <= 0) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
-                message: "page or pageSize must be grater than zero"
-            })
+                message: "Page or pageSize must be greater than zero",
+            });
         }
 
         const categories = await Categories.find();
 
-        console.log(categories);
         if (!categories || categories.length === 0) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
-                message: "categories not found"
-            })
+                message: "Categories not found",
+            });
         }
 
-        let startIndex = 0, endIndex = 0, pagination = [...categories];
+        const startIndex = (page - 1) * pageSize;
+        const pagination = categories.slice(startIndex, startIndex + pageSize);
 
-        if (page > 0 || pageSize > 0) {
-            startIndex = (page - 1) * pageSize;
-            endIndex = startIndex + pageSize;
-            pagination = categories.slice(startIndex,endIndex)
-        }
-
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            totalData:categories.length,
-            message: "categories feched successfully",
-            data: pagination
-        })
+            totalData: categories.length,
+            message: "Categories fetched successfully",
+            data: pagination,
+        });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "internal server error:" + error.message
-        })
+            message: "Internal server error: " + error.message,
+        });
     }
-}
+};
 
 const getcategories = async (req, res) => {
     try {
-
-        console.log(req.params.category_id);
-
         const category = await Categories.findById(req.params.category_id);
-        console.log(category);
-
 
         if (!category) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
-                message: "Category not found"
-            })
+                message: "Category not found",
+            });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Category fetched sucessfully",
-            data: category
-        })
-
+            message: "Category fetched successfully",
+            data: category,
+        });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "internal server error:" + error.message
-        })
+            message: "Internal server error: " + error.message,
+        });
     }
-}
+};
+
 
 const postcategories = async (req, res) => {
-
-    console.log("dhavhvqdhws", req.body);
-
     try {
-        console.log(req.body);
-
         const category = await Categories.create(req.body);
-        console.log(category);
 
         if (!category) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
-                message: "Category not creted"
-            })
+                message: "Category not created",
+            });
         }
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "Category careted sucessfully",
-            data: category
-        })
+            message: "Category created successfully",
+            data: category,
+        });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "internal server error:" + error.message
-        })
+            message: "Internal server error: " + error.message,
+        });
     }
-}
+};
 
 const deletecategories = async (req, res) => {
     try {
-
-        console.log(req.params.category_id);
-
         const category = await Categories.findByIdAndDelete(req.params.category_id);
-        console.log(category);
-
 
         if (!category) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
-                message: "Category not found"
-            })
+                message: "Category not found",
+            });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Category fetched sucessfully",
-            data: category
-        })
-
+            message: "Category deleted successfully",
+            data: category,
+        });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "internal server error:" + error.message
-        })
+            message: "Internal server error: " + error.message,
+        });
     }
-}
+};
 
 const updatecategories = async (req, res) => {
-    console.log("hdbdjwh",req.params.category_id, req.body);
-
-
-
     try {
-        const category = await Categories.findByIdAndUpdate(req.params.category_id, req.body, { new: true }, { runValidators: true });
-        console.log(category);
+        const category = await Categories.findByIdAndUpdate(
+            req.params.category_id,
+            req.body,
+            { new: true, runValidators: true }
+        );
 
         if (!category) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
-                message: "Category not update."
-            })
+                message: "Category not updated",
+            });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Category update sucessfully",
-            data: category
-        })
+            message: "Category updated successfully",
+            data: category,
+        });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "internal server error:" + error.message
-        })
+            message: "Internal server error: " + error.message,
+        });
     }
-}
+};
 
-const countactive = async (req, res) => {
+const countActive = async (req, res) => {
+    try {
+        const category = await Categories.aggregate([
+            { $match: { isActive: true } },
+            { $count: "ActiveCategory" },
+        ]);
 
-    const activeCount = await Categories.aggregate([
-        [
-            {
-                $match: {
-                    isActive: true
-                }
-            },
-            {
-                $count: 'count-of-active-categories'
-            }
-        ]
-    ])
-    res.status(200).json({
-        success: true,
-        data: activeCount
-    })
-    console.log(activeCount);
+        return res.status(200).json({
+            success: true,
+            message: "Active category count",
+            data: category,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
+};
 
-}
+const countinActive = async (req, res) => {
+    try {
+        const category = await Categories.aggregate([{ $match: { isActive: false } }]);
 
-const inactive = async (req, res) => {
-    const inactiveCount = await Categories.aggregate([
+        return res.status(200).json({
+            success: true,
+            message: "Inactive category count",
+            data: category,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
+};
 
-        {
-            $match: {
-                isActive: false
-            }
-        }
-
-    ])
-    res.status(200).json({
-        success: true,
-        data: inactiveCount
-    })
-    console.log(inactiveCount);
-}
-
-const mostproducts = async (req, res) => {
-
-    const activeCount = await Categories.aggregate([
-        [
-            {
-                $match: {
-                    isActive: true
-                }
-            },
+const highestnum = async (req, res) => {
+    try {
+        const highestnumproduct = await Categories.aggregate([
             {
                 $lookup: {
                     from: "products",
                     localField: "_id",
                     foreignField: "category_id",
-                    as: "products"
-                }
+                    as: "products",
+                },
             },
             {
                 $project: {
                     categoryName: "$name",
-                    productCount: { $size: "$products" }
-                }
+                    productCount: { $size: "$products" },
+                },
             },
-            {
-                $sort: {
-                    productCount: -1
-                }
-            },
-            {
-                $limit: 3
-            }
-        ]
+            { $sort: { productCount: -1 } },
+            { $limit: 3 },
+        ]);
 
-    ])
-    res.status(200).json({
-        success: true,
-        message: "Highest products get sucessfully",
-        data: activeCount
-    })
-    console.log(activeCount);
+        return res.status(200).json({
+            success: true,
+            message: "Highest number of products per category retrieved successfully",
+            data: highestnumproduct,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
+};
 
-}
-
-const totalProducts = async (req, res) => {
-    const totalProductsPerCategory = await Categories.aggregate([
-        [
+const countsubcategories = async (req, res) => {
+    try {
+        const countsubcategori = await Categories.aggregate([
             {
                 $lookup: {
                     from: "subcategories",
                     localField: "_id",
                     foreignField: "category_id",
-                    as: "subcategory"
-                }
+                    as: "Subacategory",
+                },
             },
             {
-                $match: {
-                    subcategory: { $ne: [] }
-                }
+                $project: {
+                    _id: 1,
+                    category_name: "$name",
+                    countsubcategories: { $size: "$Subacategory" },
+                },
             },
-            {
-                $unwind: "$subcategory"
-            },
-            {
-                $group: {
-                    _id: "$_id",
-                    category_name: { $first: "$category_name" },
-                    countsubcategories: {
-                        $sum: 1
-                    },
-                    subcategories_name: {
-                        $push: "$subcategory.subcategory_name"
-                    }
-                }
-            }
-        ]
-    ]);
-    res.status(200).json({
-        success: true,
-        data: totalProductsPerCategory
-    });
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Subcategory count retrieved successfully",
+            data: countsubcategori,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
 };
 
-const averageproducts = async (req, res) => {
-    const totalProducts = await Categories.aggregate([
-        [
+const subcategorioncategories = async (req, res) => {
+    const { category_id } = req.params;
+
+    try {
+        const retviecategoryonsubcate = await Categories.aggregate([
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(category_id),
+                },
+            },
+            {
+                $lookup: {
+                    from: "subcategories",
+                    localField: "_id",
+                    foreignField: "category_id",
+                    as: "subcategories",
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    category_name: "$name",
+                    subcategories: "$subcategories",
+                },
+            },
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message: "Subcategories retrieved successfully",
+            data: retviecategoryonsubcate[0], // Assuming single category
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while retrieving subcategories",
+            error: error.message,
+        });
+    }
+};
+
+const totalProduct = async (req, res) => {
+    try {
+        const count = await Categories.aggregate([
             {
                 $lookup: {
                     from: "products",
                     localField: "_id",
                     foreignField: "category_id",
-                    as: "products"
+                    as: "product"
                 }
             },
             {
                 $match: {
-                    products: { $ne: [] }
+                    "product": { $ne: [] }
                 }
             },
             {
-                $unwind: "$products"
+                $unwind: {
+                    path: "$product"
+                }
             },
             {
                 $group: {
                     _id: "$_id",
-                    category_name: { $first: "$category_name" },
-                    "Total-products": {
+                    "category_name": { $first: "$name" },
+                    "TotalProduct": {
                         $sum: 1
+                    },
+                    "product_name": { $push: "$product.name" }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    categories: {
+                        $push: {
+                            _id: "$_id",
+                            category_name: "$category_name",
+                            TotalProduct: "$TotalProduct"
+                        }
+                    },
+                    OverallTotalProduct: { $sum: "$TotalProduct" }
+                }
+            },
+            {
+                $unwind: "$categories"
+            },
+            {
+                $project: {
+                    _id: "$categories._id",
+                    category_name: "$categories.category_name",
+                    TotalProduct: "$categories.TotalProduct",
+                    CategoryAvg: {
+                        $divide: ["$categories.TotalProduct", "$OverallTotalProduct"]
                     }
                 }
             }
-        ]
-    ]);
-    res.status(200).json({
-        success: true,
-        data: totalProducts
-    });
+        ])
+
+        return res.status(200).json({
+            success: true,
+            message: "Total products count retrieved successfully",
+            data: count,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
 };
 
 const specific = async (req, res) => {
-    const categories = await Categories.aggregate([
-        {
-            $lookup: {
-                from: "subcategories",
-                localField: "_id",
-                foreignField: "category_id",
-                as: "subcategory"
-            }
-        },
-        {
-            $project: {
-                "name": 1,
-                "subcategory": 1
-            }
-        }
-    ])
+    try {
+        const categories = await Categories.aggregate([
+            {
+                $lookup: {
+                    from: "subcategories",
+                    localField: "_id",
+                    foreignField: "category_id",
+                    as: "subcategory",
+                },
+            },
+            {
+                $project: {
+                    name: 1,
+                    subcategory: 1,
+                },
+            },
+        ]);
 
-    res.status(200).json({
-        success: true,
-        message: "Category get  succesfully",
-        data: categories
-    })
-
-    console.log(categories);
-
-}
-
-
-
+        return res.status(200).json({
+            success: true,
+            message: "Categories retrieved successfully",
+            data: categories,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error: " + error.message,
+        });
+    }
+};
 
 module.exports = {
     listcategory,
@@ -360,10 +395,12 @@ module.exports = {
     postcategories,
     deletecategories,
     updatecategories,
-    countactive,
-    inactive,
-    mostproducts,
-    totalProducts,
-    averageproducts,
-    specific
-}
+    countActive,
+    countinActive,
+    highestnum,
+    countsubcategories,
+    subcategorioncategories,
+    totalProduct,
+    specific,
+};
+

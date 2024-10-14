@@ -24,6 +24,17 @@ const __swaggerDistPath = path.join(_dirname, 'node_modules', 'swagger-ui-dist')
 const swaggerDocument = YAML.load(path.resolve('./public', 'api.yaml'));
 
 
+// app.use(
+//   'https://fruitables-server-sooty.vercel.app/api/docs',
+//   express.static(__swaggerDistPath, { index: false }), // Serve Swagger UI assets
+//   swaggerUi.serve,
+//   swaggerUi.setup(swaggerDocument, {
+//     swaggerOptions: {
+//       url: '/public/api.yaml' // Path to your YAML file
+//     }
+//   })
+// );
+
 app.use(
   '/api/docs',
   express.static(__swaggerDistPath, { index: false }), // Serve Swagger UI assets

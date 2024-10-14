@@ -283,45 +283,6 @@ const getnewtoken = async (req, res) => {
 }
 
 
-// const getnewtoken = async (req, res) => {
-//     try {
-//         const token = req.cookies.refreshToken;
-//         if (!token) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: "Refresh token missing"
-//             });
-//         }
-
-//         const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-//         const user = await Users.findById(decoded._id);
-//         if (!user || user.refreshToken !== token) {
-//             return res.status(401).json({
-//                 success: false,
-//                 message: "Invalid token"
-//             });
-//         }
-
-//         const { accessToken, refreshToken } = await generateAuthToken(user._id);
-//         res.status(200)
-//             .cookie("accessToken", accessToken, { httpOnly: true, secure: true, maxAge: 60 * 60 * 1000 })
-//             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, maxAge: 60 * 60 * 24 * 10 * 1000 })
-//             .json({
-//                 success: true,
-//                 message: "New tokens generated",
-//                 data: { accessToken }
-//             });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             success: false,
-//             message: "Internal server error"
-//         });
-//     }
-// };
-
-
-
 const logout = async (req, res) => {
     try {
         console.log(req.body._id);

@@ -1,64 +1,76 @@
 const express = require('express');
-const { productsController } = require('../../../controller');
 const upload = require('../../../middleware/upload');
-// const router = express.Router();
-
+const { controllerProducts } = require('../../../controller');
 
 const route = express.Router();
 
 route.get(
     "/list-products",
-    productsController.listProducts
+    controllerProducts.listProducts
 );
 
 route.get("/get-product/:product_id", 
-    productsController.getProduct
+    controllerProducts.getProduct
 );
 
 route.post(
     "/create-product",
     upload.single("product_image"),
-    productsController.addProducts
+    controllerProducts.addProducts
 );
 
 route.put(
     "/update-product/:product_id",
     upload.single("product_image"),
-    productsController.updateProducts
+    controllerProducts.updateProducts
 );
 
 route.delete(
     "/delete-product/:product_id",
-    productsController.deleteProducts
+    controllerProducts.deleteProducts
 );
 
+route.get(
+    "/new-arrivals",
+    controllerProducts.newArrivals
+);
 
-route.get(
-    "/productsByCategory",
-    productsController.productsByCategory
-);
-route.get(
-    "/productsBySubcategory",
-    productsController.productsBySubcategory
-);
-route.get(
-    "/topRatating",
-    productsController.topRatating
-);
-route.get(
-    "/newArrivals",
-    productsController.newArrivals
-);
-route.get(
-    "/countCategories",
-    productsController.countCategories
-);
-route.get(
-    "/search",
-    productsController.Search
-);
 route.get(
     '/variant-details/:product_id',
-    productsController.variantsDatils
+    controllerProducts.variantsDatils
+)
+
+route.get('/search-productes',
+    controllerProducts.searchProducts
+);
+
+route.get(
+    '/count-categories',
+    controllerProducts.Countcategory
+)
+
+route.get(
+    '/out-of-stock',
+    controllerProducts.outofstock
+)
+
+route.get(
+    '/productByCategory/:category_id',
+    controllerProducts.productByCategory
+)
+
+route.get(
+    '/get-ProductBySubcategory/:subcategory_id',
+    controllerProducts.getProductBySubcategory
+)
+route.get(
+    '/top-rated',
+    controllerProducts.topRate
+)
+
+
+route.get(
+    '/discounts',
+    controllerProducts.discounts
 )
 module.exports = route;

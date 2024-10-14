@@ -1,0 +1,37 @@
+  /reviews/approve/{status}/{reviews_id}:
+    get:
+      parameters:
+        - in: path
+          name: status
+          schema:
+            type: string
+          enum: [approve, disapprove] 
+          required: true
+          description: Approve or disapprove the review. Use 'approve' to approve, 'disapprove' to disapprove.
+        - in: path
+          name: reviews_id
+          schema:
+            type: string
+          required: true
+          description: ID of the review to approve or disapprove.
+      summary: Approve or disapprove a review.
+      description: Approve or disapprove a review based on the status parameter.
+      tags:
+        - reviews
+      responses:
+        '200':    # status code
+          description: Review status updated successfully.
+          content:
+            application/json:
+              schema: 
+                type: object
+              properties:
+                success:
+                  type: boolean
+                  description: Indicates if the operation was successful.
+                message:
+                  type: string
+                  description: A message describing the result.
+                data:
+                  type: object
+                  description: Data containing information about the operation.

@@ -1,45 +1,50 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const itemSchema = new mongoose.Schema(
+const ordersSchema = new mongoose.Schema(
     {
-        item_id: {
+        user_id: {
             type: mongoose.Types.ObjectId,
-            ref: "Products",
-            required: true
-        },
-        quantity: {
-            type: Number,
+            ref: "User",
             required: true,
-            default: 1
-        }
-    }
-)
-
-const orderSchema = new mongoose.Schema({
-    user_id: {
-        type: mongoose.Types.ObjectId,
-        ref: "Users",
-        required: true
-    },
-    seller_id: {
-        type: mongoose.Types.ObjectId,
-        ref: "Sellers",
-        required: true
-    },
-    shippingAddress: {
-        type: String,
-        trim: true,
-        required: true
-    },
-    amount: {
-        type: Number,
-        required: true
-    },
-    items: [itemSchema],
-    discount: {
-        type: Number,
-        default: 0
-    }
+        },
+        payment_id: {
+            type: mongoose.Types.ObjectId,
+            ref: "Payments",
+            required: true,
+        },
+        variant_id: {
+            type: mongoose.Types.ObjectId,
+            ref: "Variants",
+            required: true,
+        },
+        status: {
+            type: String,
+            required: true,
+        },
+        payment_method: {
+            type: String,
+            required: true,
+        },
+        payment_status: {
+            type: String,
+            required: true,
+        },
+        total_price: {
+            type: Number,
+            required: true, 
+        },
+        created_at: {
+            type: Date,
+            default: Date.now
+        },
+        updated_at: {
+            type: Date,
+            default: Date.now
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
+        }    
     },
     {
         timestamps: true,
@@ -47,6 +52,5 @@ const orderSchema = new mongoose.Schema({
     }
 )
 
-const Orders = mongoose.model("Orders", orderSchema)
-
-module.exports = Orders
+const Orders = mongoose.model("Orders", ordersSchema);
+module.exports = Orders;
